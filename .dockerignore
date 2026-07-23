@@ -4,9 +4,7 @@ __pycache__
 *.pyc
 .git
 .gitignore
-.DS_Store
-.env
-.env.*
-*.log
+.vscode
 node_modules
 frontend-ng/node_modules
+.DS_Store

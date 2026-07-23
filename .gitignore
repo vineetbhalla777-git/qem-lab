@@ -2,7 +2,11 @@
 venv/
 __pycache__/
 *.pyc
+
+frontend-ng/node_modules/
+
+.vscode/
 .DS_Store
+
 .env
-.env.*
-*.log
+*.env
