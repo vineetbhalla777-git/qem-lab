@@ -1,0 +1,169 @@
+<section class="view active">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">Interactive</div>
+      <h2 class="display-lg">Run a live experiment</h2>
+      <p class="lede">Pick a technique and a noise level. Every run executes a real noisy quantum circuit simulation on the server — nothing here is precomputed.</p>
+    </div>
+  </div>
+
+  <div class="console">
+    <div class="panel">
+      <ng-container *ngIf="!loadingTechniques && !loadError">
+        <div class="control-group">
+          <div class="control-label"><span>Mitigation technique</span></div>
+          <select [(ngModel)]="selectedTechnique" (ngModelChange)="onTechniqueChange()">
+            <option *ngFor="let key of techniqueKeys" [value]="key">
+              {{ techniques[key].short }} — {{ techniques[key].name }}
+            </option>
+          </select>
+          <div class="technique-desc">{{ currentDescription }}</div>
+          <div class="technique-desc" style="margin-top:8px; border-color: var(--noise-dim);">
+            Noise model: {{ currentNoiseType }}
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label"><span>Benchmark circuit</span></div>
+          <select [(ngModel)]="selectedBenchmark" (ngModelChange)="onBenchmarkChange()">
+            <option *ngFor="let key of availableBenchmarkKeys" [value]="key">
+              {{ benchmarks[key].name }}
+            </option>
+          </select>
+          <div class="technique-desc" *ngIf="selectedBenchmark">{{ benchmarks[selectedBenchmark].description }}</div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label"><span>Qubit count</span><span class="value">{{ selectedQubits }}</span></div>
+          <select [(ngModel)]="selectedQubits" [disabled]="qubitOptions.length <= 1">
+            <option *ngFor="let n of qubitOptions" [value]="n">{{ n }} qubits</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label"><span>Noise strength</span><span class="value">{{ noiseStrength }}</span></div>
+          <input type="range" min="0" max="1" step="0.01" [(ngModel)]="noiseStrength" />
+        </div>
+
+        <div class="control-group">
+          <div class="control-label"><span>Shots</span><span class="value">{{ shots }}</span></div>
+          <input type="range" min="200" max="4000" step="100" [(ngModel)]="shots" />
+        </div>
+
+        <button class="btn btn-primary" style="width:100%; justify-content:center;" [disabled]="running" (click)="runExperiment()">
+          <span class="spinner" *ngIf="running"></span>
+          {{ running ? 'Running on simulator…' : 'Run experiment' }}
+        </button>
+      </ng-container>
+
+      <div class="state-empty" *ngIf="loadError">{{ loadError }}</div>
+    </div>
+
+    <div>
+      <div class="state-empty" *ngIf="!result && !runError">
+        Set your parameters and press "Run experiment" to simulate a noisy circuit and mitigate it live.
+      </div>
+
+      <div class="state-empty" style="border-color:#f76c6c; color:#f76c6c;" *ngIf="runError">
+        Run failed: {{ runError }}
+      </div>
+
+      <ng-container *ngIf="result">
+        <div class="readout-grid">
+          <div class="readout ideal">
+            <div class="tag">Ideal</div>
+            <div class="value">{{ result.ideal.toFixed(4) }}</div>
+            <div class="sub">Noiseless ground truth</div>
+            <div class="bar-track"><div class="bar-fill" [style.width]="barWidth(result.ideal)" style="background:#4fd8c4;"></div></div>
+          </div>
+          <div class="readout raw">
+            <div class="tag">Raw (noisy)</div>
+            <div class="value">{{ result.raw.toFixed(4) }}</div>
+            <div class="sub">error {{ result.raw_error.toFixed(4) }}</div>
+            <div class="bar-track"><div class="bar-fill" [style.width]="barWidth(result.raw)" style="background:#f2a65a;"></div></div>
+          </div>
+          <div class="readout mitigated">
+            <div class="tag">Mitigated</div>
+            <div class="value">{{ result.mitigated.toFixed(4) }}</div>
+            <div class="sub">error {{ result.mitigated_error.toFixed(4) }}</div>
+            <div class="bar-track"><div class="bar-fill" [style.width]="barWidth(result.mitigated)" style="background:#8b93f8;"></div></div>
+          </div>
+        </div>
+
+        <div class="improvement-banner" [style.border-color]="verdict().color + '44'" [style.color]="verdict().color">
+          <span>Error {{ verdict().label }} by <strong>{{ result.error_reduction_pct.toFixed(1) }}%</strong></span>
+          <span class="mono" style="color: var(--ink-faint);">{{ result.wall_time_s }}s · {{ result.shots }} shots</span>
+        </div>
+
+        <div class="technique-desc" style="margin-top:12px; border-color:#f2a65a;" *ngFor="let note of result.notes">
+          ⚠ {{ note }}
+        </div>
+
+        <button class="btn btn-ghost" style="margin-top:14px;" [disabled]="explaining" (click)="explainResult()">
+          <span class="spinner" *ngIf="explaining" style="border-top-color:#e7eaf0; border-color: rgba(231,234,240,0.25);"></span>
+          {{ explaining ? 'Explaining…' : '✦ Explain this result in plain English' }}
+        </button>
+
+        <div class="panel" style="margin-top:14px;" *ngIf="explanation">
+          <div class="control-label"><span>Plain-English explanation</span></div>
+          <p style="margin:0; color: var(--ink);">{{ explanation }}</p>
+          <div class="chat-mode-tag" style="margin-top:10px;">
+            {{ explanationUsedLlm ? '✦ LLM-generated' : '⌕ Template-based (no LLM API key configured)' }}
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:20px;">
+          <div class="control-label"><span>Run details</span></div>
+          <table class="data-table" style="width:100%;">
+            <tbody>
+              <tr><td>Technique</td><td>{{ result.technique_name }}</td></tr>
+              <tr><td>Benchmark circuit</td><td>{{ result.benchmark }}</td></tr>
+              <tr><td>Observable / metric</td><td>{{ result.observable }}</td></tr>
+              <tr><td>Noise strength</td><td>{{ result.noise_strength }}</td></tr>
+              <tr *ngFor="let row of detailRows"><td>{{ row.key }}</td><td>{{ row.value }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <ng-container *ngIf="result">
+    <hr class="rule" />
+    <div class="section-head">
+      <div>
+        <h3 class="display-md">Circuit used in this run</h3>
+        <p>The exact benchmark circuit simulated above — depth {{ result.circuit_depth }}, {{ gateCountEntries().length }} distinct gate types.</p>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="control-label" style="margin-bottom:14px;"><span>Circuit diagram</span></div>
+        <div *ngIf="result.circuit_diagram; else noDiagram" style="overflow-x:auto; background:#0e1117; border-radius:8px; padding:12px;">
+          <img [src]="result.circuit_diagram" alt="Circuit diagram" style="max-width:100%; height:auto; display:block; margin:0 auto;" />
+        </div>
+        <ng-template #noDiagram>
+          <div class="state-empty">Diagram unavailable for this circuit.</div>
+        </ng-template>
+      </div>
+
+      <div class="card">
+        <div class="control-label" style="margin-bottom:14px;"><span>Gates used</span></div>
+        <table class="data-table" style="width:100%;">
+          <thead><tr><th>Gate</th><th>Count</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let g of gateCountEntries()">
+              <td class="mono">{{ g.gate }}</td>
+              <td class="mono">{{ g.count }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="technique-desc" style="margin-top:14px;">
+          Circuit depth: {{ result.circuit_depth }} · {{ result.n_qubits }} qubits ·
+          gate counts reflect fully-decomposed elementary operations, which is the level noise actually applies at.
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</section>

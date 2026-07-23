@@ -1,0 +1,60 @@
+<section class="view active">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">Precomputed benchmark suite</div>
+      <h2 class="display-lg">Results dashboard</h2>
+      <p class="lede">Full sweep results from <code>run_benchmark_suite.py</code> — noise strengths 0.05 to 0.35, 3000 shots per evaluation.</p>
+    </div>
+  </div>
+
+  <div class="state-empty" *ngIf="loading">Loading precomputed results…</div>
+  <div class="state-empty" *ngIf="error">{{ error }}</div>
+
+  <div class="grid grid-2" *ngIf="!loading && !error">
+    <div class="card chart-card" *ngFor="let g of groups">
+      <h3 class="display-md" style="font-size:16px; margin-bottom:14px;">{{ g.title }}</h3>
+      <canvas #chartCanvas></canvas>
+    </div>
+  </div>
+
+  <ng-container *ngIf="!loading && !error">
+    <hr class="rule" />
+
+    <div class="section-head">
+      <h3 class="display-md">Raw data</h3>
+    </div>
+    <div class="filter-bar">
+      <button
+        class="chip"
+        *ngFor="let f of filterOptions"
+        [class.active]="f === activeFilter"
+        (click)="setFilter(f)"
+      >{{ f === 'all' ? 'All experiments' : f }}</button>
+    </div>
+    <div class="results-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr><th *ngFor="let c of tableColumns">{{ c }}</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of visibleRows">
+            <td *ngFor="let c of tableColumns">{{ row[c] || '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="rule" />
+
+    <div class="section-head">
+      <h3 class="display-md">Figures</h3>
+    </div>
+    <div class="grid grid-2">
+      <div class="card figure-card" *ngFor="let f of figures">
+        <img [src]="figureUrl(f)" [alt]="f" loading="lazy" />
+        <div class="sub mono" style="margin-top:10px; color:var(--ink-faint); font-size:12px;">{{ f }}</div>
+      </div>
+    </div>
+    <div class="state-empty" *ngIf="figuresError">{{ figuresError }}</div>
+  </ng-container>
+</section>

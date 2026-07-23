@@ -1,0 +1,58 @@
+<section class="view active">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Live noise simulation · 6 mitigation techniques</div>
+      <h1 class="display-xl">Turn noisy qubits<br/>into clean answers.</h1>
+      <p class="lede">
+        Real quantum processors make mistakes on every gate and every
+        measurement. This console simulates that noise, then runs six
+        published error-mitigation techniques against it in real time —
+        so you can see exactly what each one buys you, and what it costs.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" routerLink="/live">Run a live experiment →</a>
+        <a class="btn btn-ghost" routerLink="/results">View benchmark data</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="num">6</div><div class="label">techniques implemented</div></div>
+        <div class="hero-stat"><div class="num">5</div><div class="label">benchmark circuits</div></div>
+        <div class="hero-stat"><div class="num">&lt;2s</div><div class="label">per live simulation</div></div>
+      </div>
+    </div>
+
+    <div class="hero-scope">
+      <canvas #heroCanvas id="hero-canvas"></canvas>
+      <div class="hero-scope-legend">
+        <span><span class="legend-dot" style="background:#f2a65a"></span>Raw (noisy)</span>
+        <span><span class="legend-dot" style="background:#8b93f8"></span>Mitigated</span>
+        <span><span class="legend-dot" style="background:#4fd8c4"></span>Ideal</span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="rule" />
+
+  <div class="section-head">
+    <div>
+      <h2 class="display-lg">How the pipeline works</h2>
+      <p>Every experiment on this site runs the same four-stage pipeline against a real Qiskit + Mitiq backend.</p>
+    </div>
+  </div>
+  <div class="grid grid-3">
+    <div class="card">
+      <div class="eyebrow">Stage 1</div>
+      <h3 class="display-md">Simulate the hardware</h3>
+      <p>A tunable noise profile generates depolarizing error, T1/T2 decoherence, and asymmetric readout error at a chosen strength.</p>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Stage 2</div>
+      <h3 class="display-md">Run the benchmark</h3>
+      <p>A standard circuit — Bell state, GHZ, QFT, VQE, or QAOA — executes on the noisy simulator via Qiskit Aer.</p>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Stage 3</div>
+      <h3 class="display-md">Mitigate</h3>
+      <p>One of six techniques (ZNE, MEM, PEC, CDR, DDD, or Virtual Distillation) processes the noisy result.</p>
+    </div>
+  </div>
+</section>

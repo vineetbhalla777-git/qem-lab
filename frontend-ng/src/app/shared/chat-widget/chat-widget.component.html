@@ -1,0 +1,45 @@
+<button class="chat-fab" (click)="toggle()" [class.open]="chatState.isOpen" aria-label="Toggle assistant">
+  <svg *ngIf="!chatState.isOpen" width="22" height="22" viewBox="0 0 24 24" fill="none">
+    <path d="M4 4h16v12H8l-4 4V4z" stroke="#0e1117" stroke-width="1.8" stroke-linejoin="round"/>
+  </svg>
+  <svg *ngIf="chatState.isOpen" width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M5 5l14 14M19 5L5 19" stroke="#0e1117" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+</button>
+
+<aside class="chat-panel" [class.open]="chatState.isOpen">
+  <div class="chat-panel-header">
+    <div>
+      <div class="eyebrow" style="margin-bottom:2px;">QEM Assistant</div>
+      <div class="chat-panel-sub">Grounded in this project's docs + IBM Quantum &amp; QEM research</div>
+    </div>
+  </div>
+
+  <div class="chat-messages">
+    <div *ngFor="let m of chatState.messages" class="chat-msg" [class.user]="m.role === 'user'">
+      <div class="chat-bubble" [class.user]="m.role === 'user'">
+        <div style="white-space: pre-wrap;">{{ m.content }}</div>
+        <div class="chat-sources" *ngIf="m.sources && m.sources.length">
+          <span class="pill" *ngFor="let s of m.sources">{{ s.source }}</span>
+        </div>
+        <div class="chat-mode-tag" *ngIf="m.role === 'assistant' && m.usedLlm !== undefined">
+          {{ m.usedLlm ? '✦ LLM-generated' : '⌕ Retrieval-only (no API key configured)' }}
+        </div>
+      </div>
+    </div>
+    <div class="chat-msg" *ngIf="sending">
+      <div class="chat-bubble"><span class="spinner" style="border-top-color:#8b93f8; border-color: rgba(139,147,248,0.25);"></span> Thinking…</div>
+    </div>
+  </div>
+
+  <div class="chat-input-row">
+    <textarea
+      class="chat-input"
+      rows="1"
+      placeholder="Ask about quantum errors, mitigation techniques, or this project…"
+      [(ngModel)]="draft"
+      (keydown)="onKeydown($event)"
+    ></textarea>
+    <button class="btn btn-primary" (click)="send()" [disabled]="sending || !draft.trim()">Send</button>
+  </div>
+</aside>

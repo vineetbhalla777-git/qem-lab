@@ -1,0 +1,16 @@
+qiskit==2.5.0
+qiskit-aer==0.17.2
+mitiq==1.0.0
+numpy==2.2.6
+matplotlib==3.10.8
+scipy==1.17.1
+networkx==3.6.1
+ply==3.11
+fastapi==0.139.0
+uvicorn==0.51.0
+python-multipart==0.0.32
+pandas==2.3.3
+scikit-learn==1.8.0
+joblib==1.5.3
+anthropic==0.116.0
+pylatexenc==2.10

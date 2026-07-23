@@ -1,0 +1,4 @@
+Training rows: 230   Test rows: 58
+Model MAE:     0.05942
+Baseline MAE (predict mean): 0.07889
+Model R^2:     0.1165

@@ -1,0 +1,38 @@
+<section class="view active">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">Project report</div>
+      <h2 class="display-lg">What we found</h2>
+      <p class="lede">Mitigation is not a universal "make it better" button. Here's what the full benchmark sweep actually showed.</p>
+    </div>
+  </div>
+
+  <div class="about-body">
+    <div class="finding-card positive">
+      <strong>Measurement Error Mitigation</strong> was the most reliable technique tested — raising GHZ-state fidelity from 0.88–0.96 to 0.98–0.99 at every noise level, since readout error is a purely classical channel that calibration-matrix inversion recovers almost exactly.
+    </div>
+    <div class="finding-card positive">
+      <strong>Clifford Data Regression</strong> delivered consistent 74–86% error reduction on the VQE benchmark across all noise levels tested, degrading gracefully as noise increased.
+    </div>
+    <div class="finding-card mixed">
+      <strong>Zero-Noise Extrapolation</strong> actually increased error on our shallow 3-qubit GHZ benchmark at low-to-moderate noise — a real, reproducible limitation on short circuits, not an implementation defect. Mitiq itself warns about this case.
+    </div>
+    <div class="finding-card mixed">
+      <strong>Probabilistic Error Cancellation</strong> is highly sensitive to how well its assumed noise model matches the actual device — and to sampling variance at low sample counts.
+    </div>
+    <div class="finding-card mixed">
+      <strong>Virtual Distillation's</strong> own ancilla-and-SWAP-gate circuitry introduces noise that can offset the exponential suppression it's designed to provide, especially at shallow depth — a documented effect in the literature, not a bug.
+    </div>
+
+    <h3>Full write-up</h3>
+    <p>The complete methodology, per-technique breakdowns, and scalability analysis are in <code>REPORT.md</code> in the project repository, alongside the raw CSV and every figure shown in the Results tab.</p>
+
+    <h3>Stack</h3>
+    <ul>
+      <li>Simulation: Qiskit + Qiskit Aer (noise models, circuit execution)</li>
+      <li>Mitigation: Mitiq (ZNE, PEC, CDR, DDD) + custom implementations (MEM, ancilla-based Virtual Distillation)</li>
+      <li>Backend: FastAPI serving live simulation requests</li>
+      <li>Frontend: Angular (standalone components, Router, HttpClient) + Chart.js</li>
+    </ul>
+  </div>
+</section>

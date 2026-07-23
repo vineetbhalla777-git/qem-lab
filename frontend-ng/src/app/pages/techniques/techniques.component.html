@@ -1,0 +1,23 @@
+<section class="view active">
+  <div class="section-head">
+    <div>
+      <div class="eyebrow">Reference</div>
+      <h2 class="display-lg">Six approaches to the same problem</h2>
+      <p class="lede">Each technique represents a genuinely different strategy for fighting noise — from statistical cancellation to machine-learned correction.</p>
+    </div>
+  </div>
+
+  <div class="grid grid-3" *ngIf="!loading && !error">
+    <div class="card tech-card" *ngFor="let t of techniques">
+      <div class="tech-head">
+        <div class="tech-short">{{ t.short }}</div>
+        <span class="pill pill-mitigated">{{ t.benchmark.toUpperCase() }}</span>
+      </div>
+      <h3 class="display-md">{{ t.name }}</h3>
+      <p>{{ t.description }}</p>
+      <div class="tech-overhead">OVERHEAD&nbsp;&nbsp;{{ t.overhead }}</div>
+    </div>
+  </div>
+
+  <div class="state-empty" *ngIf="error">{{ error }}</div>
+</section>
